@@ -1,0 +1,130 @@
+#!/usr/bin/bash
+
+# Check for and install apt packages
+REQUIRED_APT_PACKAGES=(
+    "ripgrep"
+    "lsd"
+    "xclip"
+    "wl-clipboard" 
+    "tmux"
+    "luarocks"
+    "npm"
+    "nodejs"
+    "build-essential"
+    "curl"
+)
+
+echo "Checking for Required Packages"
+
+for pkg in "${REQUIRED_APT_PACKAGES[@]}"; do
+    if ! dpkg -s "$pkg" >/dev/null 2>&1; then
+        read -p "Package '$pkg' is not installed. Install? (y/n)" response
+        if [[ "$response" == "y" || "$response" == "yes" ]]; then
+            sudo apt-get update && sudo apt-get install -y "$pkg"
+            if [ $? -eq 0 ]; then
+                echo "Successfully installed '$pkg'."
+            else
+                echo "Failed to install '$pkg'."
+            fi
+        fi
+    else
+        echo "'$pkg' already installed."
+    fi
+done
+
+# Check for and install Homebrew
+if ! which "brew" >dev/null 2>&1; then
+    read -p "Homebrew is not installed. Install? (y/n)" response
+    if [[ "$response" == "y" || "$response" == "yes" ]]; then
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        if [ $? -eq 0]; then 
+            echo "Successfully installed Homebrew"
+        else
+            echo "Failed to install Homebrew. Homebrew is required to continue. Exiting"
+            exit 1
+        fi
+    else
+        echo "Homebrew is required to continue. Exiting."
+        exit 0
+    fi
+else
+    echo "Homebrew already installed."
+fi
+
+# Make homebrew able to be used within this script
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+# Create homebrew additions in .bashrc
+echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.bashrc
+echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/fzf --bash)"' >> ~/.bashrc
+echo 'source /home/linuxbrew/.linuxbrew/Cellar/fzf/0.65.1/shell/completion.bash' >> ~/.bashrc
+echo 'source /home/linuxbrew/.linuxbrew/Cellar/fzf/0.65.1/shell/key-bindings.bash' >> ~/.bashrc
+
+# Check for and install homebrew formulae
+REQUIRED_BREW_FORMULAE=(
+    "neovim"
+    "fzf"
+    "stylua"
+    "tree-sitter"
+)
+
+for pkg in "${REQUIRED_BREW_FORMULAE[@]}"; do                                    
+    if ! brew ls --version "$pkg" >/dev/null 2>&1; then                                   
+        read -p "Package '$pkg' is not installed. Install? (y/n)" response      
+        if [[ "$response" == "y" || "$response" == "yes" ]]; then               
+            brew install "$pkg"               
+            if [ $? -eq 0 ]; then                                               
+                echo "Successfully installed '$pkg'."                           
+            else                                                                
+                echo "Failed to install '$pkg'."                                
+            fi                                                                  
+        fi                                                                      
+    else                                                                        
+        echo "'$pkg' already installed."                                        
+    fi                                                                          
+done
+
+# Check for and install fira code nerd font
+
+if ! brew ls --cask --version "font-fira-code-nerd-font" >/dev/null 2>&1; then
+    read -p "A Nerd Font is not installed. Install? (y/n)" response
+    if [[ "$response" == "y" || "$response" == "yes" ]]; then                   
+        brew install --cask "font-fira-code-nerd-font"
+        if [ $? -eq 0]; then                                                    
+            echo "Successfully installed Fira Code Nerd Font"                                                              
+        fi                                                                                                                                        
+    fi                                                                          
+else                                                                            
+    echo "A Nerd Font is already installed"
+fi
+
+# Copy tmux config
+if [ -f "~/.tmux.conf" ]; then
+    read -p "A tmux config file already exists. Replace? (y/n)" response             
+    if [[ "$response" == "y" || "$response" == "yes" ]]; then                   
+        cp ./.tmux.conf ~/.tmux.conf                          
+    fi
+else
+    cp ./.tmux.conf ~/.tmux.conf
+fi
+
+# Copy neovim config
+if [ ! -d "~/.config/nvim" ]; then
+  mkdir --parents ~/.config/nvim
+fi
+
+if [ -n "$(ls -A ~/.config/nvim)" ]; then
+    read -p "It looks like you have an existing Neovim configuration. Replace? (y/n)" response             
+    if [[ "$response" == "y" || "$response" == "yes" ]]; then
+        rm -rf ~/.config/nvim/*
+        cp ./nvim/* ~/.config/nvim/
+    fi
+else
+    cp ./nvim/* ~/.config/nvim/
+fi
+
+echo "Development Environment Initialized."
+echo "Scripts from this repository are not handled by the initialization script."
+echo "Please copy the desired scripts to your local scripts folder manually."
+
+
