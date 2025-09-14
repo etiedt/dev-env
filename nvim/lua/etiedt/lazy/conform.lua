@@ -1,19 +1,3 @@
---return {
---    "stevearc/conform.nvim",
---    opt = {
---        formatters_by_ft = {
---            lua = { "stylua", lsp_format = "fallback" },
---            pyhton = { "isort", "black", lsp_format = "fallback" },
---            javascript = { "prettier", lsp_format = "fallback" },
---        },
---        format_on_save = {
---            -- These options will be passed to conform.format()
---            timeout_ms = 500,
---            lsp_format = "fallback",
---        },
---    },
---}
-
 return {
 	"stevearc/conform.nvim",
 	config = function()
@@ -34,7 +18,12 @@ return {
 				-- Conform will run multiple formatters sequentially
 				python = { "isort", "ruff", "black" },
 				-- Use a sub-list to run only the first available formatter
-				javascript = { "prettier" },
+				javascript = {
+					{
+						"prettier",
+						extra_args = { "--tab-width", "4" },
+					},
+				},
 			},
 		})
 	end,
