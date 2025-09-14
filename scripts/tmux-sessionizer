@@ -16,14 +16,36 @@ fi
 selected_name=$(basename "$selected" | tr . _)
 tmux_running=$(pgrep tmux)
 
+# Find virtual environment
+venv_dir=""
+potential_venvs=(
+    "venv"
+    ".venv"
+)
+
+for venv in "${potential_venvs[@]}"; do
+    echo "$selected_name/$venv"
+    if [ -d "$selected/$venv" ]; then
+        venv_dir="$selected/$venv"
+        break
+    fi
+done
+
 # No tmux running
 if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
     tmux new-session -s $selected_name -c $selected
+    tmux rename-window -t $selected_name:1 nvim
     tmux split-window -v -t $selected_name:1
     tmux resize-pane -t $selected_name:1.0 -D 10
     tmux send-keys -t $selected_name:1.0 "cd $selected" C-m
+    if [ -n "$venv_dir" ]; then
+       tmux send-keys -t $selected_name:1.0 "source $venv_dir/bin/activate" C-m
+    fi
     tmux send-keys -t $selected_name:1.0 "nvim ." C-m
-    tmux send-keys -t $selected_name:1.1 "cd $selected" C-m
+    tmux send-keys -t $selected_name:1.1 "cd $selected" C-m 
+    if [ -n "$venv_dir" ]; then
+       tmux send-keys -t $selected_name:1.1 "source $venv_dir/bin/activate" C-m
+    fi
     tmux send-keys -t $selected_name:1.1 "clear" C-m
     exit 0
 fi
@@ -31,11 +53,18 @@ fi
 # Tmux running
 if ! tmux has-session -t=$selected_name 2> /dev/null; then
     tmux new-session -ds $selected_name -c $selected
+    tmux rename-window -t $selected_name:1 nvim
     tmux split-window -v -t $selected_name:1
     tmux resize-pane -t $selected_name:1.0 -D 10
     tmux send-keys -t $selected_name:1.0 "cd $selected" C-m 
+    if [ -n "$venv_dir" ]; then
+       tmux send-keys -t $selected_name:1.0 "source $venv_dir/bin/activate" C-m
+    fi
     tmux send-keys -t $selected_name:1.0 "nvim ." C-m
     tmux send-keys -t $selected_name:1.1 "cd $selected" C-m
+    if [ -n "$venv_dir" ]; then
+       tmux send-keys -t $selected_name:1.1 "source $venv_dir/bin/activate" C-m
+    fi
     tmux send-keys -t $selected_name:1.1 "clear" C-m
 fi
 
