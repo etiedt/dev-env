@@ -12,6 +12,7 @@ return {
 			-- Actions
 			map("n", "<leader>gp", gs.preview_hunk, "Preview hunk")
 			map("n", "<leader>gb", gs.toggle_current_line_blame, "Toggle line blame")
+			--map("n", "<leader>gd", gs.diffthis, "Diff this")
 		end,
 	},
 }

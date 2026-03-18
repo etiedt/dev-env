@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 # TMUX_SESSIONIZER_WORK_DIRS should be a list of directories separated by a space
 work_dirs=${TMUX_SESSIONIZER_WORK_DIRS:-"$HOME"}
@@ -24,7 +24,6 @@ potential_venvs=(
 )
 
 for venv in "${potential_venvs[@]}"; do
-    echo "$selected_name/$venv"
     if [ -d "$selected/$venv" ]; then
         venv_dir="$selected/$venv"
         break
@@ -33,8 +32,7 @@ done
 
 # No tmux running
 if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
-    tmux new-session -s $selected_name -c $selected
-    tmux rename-window -t $selected_name:1 nvim
+    tmux new-session -s $selected_name -c $selected -n "nvim"
     tmux split-window -v -t $selected_name:1
     tmux resize-pane -t $selected_name:1.0 -D 10
     tmux send-keys -t $selected_name:1.0 "cd $selected" C-m
@@ -42,7 +40,7 @@ if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
        tmux send-keys -t $selected_name:1.0 "source $venv_dir/bin/activate" C-m
     fi
     tmux send-keys -t $selected_name:1.0 "nvim ." C-m
-    tmux send-keys -t $selected_name:1.1 "cd $selected" C-m 
+    tmux send-keys -t $selected_name:1.1 "cd $selected" C-m
     if [ -n "$venv_dir" ]; then
        tmux send-keys -t $selected_name:1.1 "source $venv_dir/bin/activate" C-m
     fi
@@ -52,8 +50,7 @@ fi
 
 # Tmux running
 if ! tmux has-session -t=$selected_name 2> /dev/null; then
-    tmux new-session -ds $selected_name -c $selected
-    tmux rename-window -t $selected_name:1 nvim
+    tmux new-session -ds $selected_name -c $selected -n "nvim"
     tmux split-window -v -t $selected_name:1
     tmux resize-pane -t $selected_name:1.0 -D 10
     tmux send-keys -t $selected_name:1.0 "cd $selected" C-m 
