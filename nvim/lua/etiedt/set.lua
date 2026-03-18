@@ -37,3 +37,8 @@ vim.opt.clipboard = "unnamedplus"
 vim.diagnostic.config({
 	virtual_text = true,
 })
+vim.cmd([[highlight DiagnosticVirtualTextError guibg=#1a212e]])
+vim.cmd([[highlight DiagnosticVirtualTextWarn guibg=#1a212e]])
+vim.cmd([[highlight DiagnosticVirtualTextInfo guibg=#1a212e]])
+vim.cmd([[highlight DiagnosticVirtualTextHint guibg=#1a212e]])
+

@@ -20,3 +20,6 @@ vim.keymap.set("n", "<C-l>", ":wincmd l<CR>")
 vim.keymap.set("n", "<leader>cf", function()
 	require("conform").format({ lsp_format = "fallback" })
 end, { desc = "Format current buffer" })
+
+-- Helpful Bindings
+vim.keymap.set("n", "<leader>r", vim.lsp.buf.rename, { desc = "LSP Rename" })

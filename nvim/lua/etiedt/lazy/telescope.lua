@@ -18,6 +18,7 @@ return {
 						["<Esc>"] = actions.close,
 						["<C-n>"] = actions.preview_scrolling_down,
 						["<C-p>"] = actions.preview_scrolling_up,
+						["<C-q>"] = actions.smart_send_to_qflist,
 					},
 				},
 			},
@@ -34,7 +35,8 @@ return {
 		)
 		vim.keymap.set("n", "<leader>ft", "<cmd>TodoTelescope<cr>", { desc = "Find todos" })
 		vim.keymap.set("n", "<leader>tf", function()
-			require("telescope.builtin").lsp_document_symbols({ symbols = { "method", "function" } })
-		end, { desc = "Find functions" })
+			builtin.lsp_document_symbols({ symbols = { "function", "method", "class" } })
+		end, { desc = "Find functions in current file" })
+		vim.keymap.set("n", "<leader>fr", builtin.lsp_references, { desc = "Find references under cursor" })
 	end,
 }
