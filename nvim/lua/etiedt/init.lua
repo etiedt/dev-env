@@ -5,7 +5,7 @@ require("etiedt.lazy_init")
 
 vim.g.netrw_banner = 0
 
--- Give syntac highlighting to .env files
+-- Give syntac highlighting to .env files and Dockerfiles
 vim.filetype.add({
   extension = {
     env = "sh",
@@ -15,5 +15,6 @@ vim.filetype.add({
   },
   pattern = {
     ["%.env%.[%w_.-]+"] = "sh",
+    ["Dockerfile.*"] = "dockerfile",
   },
 })
