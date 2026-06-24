@@ -15,6 +15,7 @@ return {
 
 		local mason_tool_installer = require("mason-tool-installer")
 
+
 		-- enable mason and configure icons
 		mason.setup({
 			ui = {
@@ -35,9 +36,10 @@ return {
 				"cssls",
 				"tailwindcss",
 				"lua_ls",
-				"pyright",
+				"basedpyright",
 				"ruff",
 				"bashls",
+                "vue_ls",
 			},
 		})
 
@@ -52,5 +54,28 @@ return {
 				"ruff",
 			},
 		})
+
+        local vue_path = vim.fn.stdpath("data") .. "/mason/packages/vue-language-server/node_modules/@vue/language-server"
+
+        vim.lsp.config("vue_ls", {
+            init_options = {
+                vue = {
+                    hybridMode = false, -- Eliminates conflict with native TS inside template tags
+                },
+            },
+        })
+        vim.lsp.config("ts_ls", {
+            init_options = {
+                plugins = {
+                    {
+                        name = "@vue/typescript-plugin",
+                        location = vue_path,
+                        languages = { "javascript", "typescript", "vue" },
+                    },
+                },
+            },
+            filetypes = { "javascript", "typescript", "vue" },
+        })
+
 	end,
 }
